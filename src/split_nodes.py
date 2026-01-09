@@ -33,8 +33,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 )
                 formatted = not formatted
         else:
-            raise Exception(f"delimiter {delimiter} not in target text {node}")
-
+            # raise Exception(f"delimiter {delimiter} not in target text {node}")
+            new_nodes.append(node)
     return new_nodes
 
 
