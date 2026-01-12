@@ -1,9 +1,52 @@
 from textnode import TextNode, TextType
+import os, logging, shutil
+
+PUBLIC = "public"
+LOGFILE = "logs/main.log"
+STATIC = "static"
+logger = logging.getLogger(__name__)
+
+
+def copy_to_public(start_dir, structure):
+    logger.info("Recursive Copy Routine")
+    for fp in os.listdir(start_dir):
+        source_path = os.path.join(start_dir, fp)
+        target_path = os.path.join(structure, fp)
+        if os.path.isdir(source_path):
+            logger.debug("Copy - Directory")
+            os.mkdir(target_path)
+            copy_to_public(source_path, target_path)
+        elif os.path.isfile(source_path):
+            logger.debug("Copy - File")
+            logger.info(f"Filepath: {source_path}\n\tStructure: {target_path}")
+            shutil.copy(source_path, target_path)
+        else:
+            logger.debug("Copy - ???")
+            print(f"Uh....{source_path} is neither a file nor directory. Now what?")
 
 
 def main():
-    dummy = TextNode("Lorem ipsum", TextType.LINK.value, "https://www.boot.dev")
-    print(dummy)
+    if os.path.exists(LOGFILE):
+        os.remove(LOGFILE)
+    logging.basicConfig(filename=LOGFILE, level=logging.DEBUG)
+
+    logger.info("Started")
+
+    if os.path.exists(PUBLIC):
+        logger.info("Deleting public folder and its contents.")
+        shutil.rmtree(PUBLIC)
+    os.mkdir(PUBLIC)
+    if os.path.exists(PUBLIC):
+        logger.info("Created fresh public folder.")
+
+    if not os.path.exists(STATIC):
+        raise Exception("Source directory not found!")
+    elif len(os.listdir(STATIC)) == 0:
+        raise Exception("No files found to copy from source directory!")
+
+    copy_to_public(STATIC, PUBLIC)
+
+    logger.info("Finished")
 
 
 if __name__ == "__main__":
