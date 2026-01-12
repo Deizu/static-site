@@ -30,10 +30,10 @@ class LeafNode(HTMLNode):
 
     def to_html(self):
         if self.value is None:
-            raise ValueError()
+            raise ValueError(f"No value present in node: {self}")
         if self.tag is None:
             return self.value
-        return f"<{self.tag}>{self.value}</{self.tag}>"
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
     def __repr__(self):
         def swap_none(attribute):
@@ -52,3 +52,9 @@ class ParentNode(HTMLNode):
         if self.children is None or len(self.children) == 0:
             raise ValueError("No children present for parent node.")
         return f"<{self.tag}>{''.join([child.to_html() for child in self.children])}</{self.tag}>"
+
+    def __repr__(self):
+        def swap_none(attribute):
+            return attribute if attribute is not None else "-"
+
+        return f"HTMLNode | Tag: {swap_none(self.tag)} | Value: {swap_none(self.value)} | Children: {len(self.children) if self.children is not None else swap_none(self.children)} | Props: {swap_none(self.props)}"

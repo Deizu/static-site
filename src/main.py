@@ -1,5 +1,6 @@
-from textnode import TextNode, TextType
 import os, logging, shutil
+from markdown_to_html_node import markdown_to_html_node
+from extract_markdown import extract_title
 
 PUBLIC = "public"
 LOGFILE = "logs/main.log"
@@ -25,6 +26,24 @@ def copy_to_public(start_dir, structure):
             print(f"Uh....{source_path} is neither a file nor directory. Now what?")
 
 
+def generate_page(from_path, template_path, dest_path):
+    placeholder_title = "{{ Title }}"
+    placeholder_content = "{{ Content }}"
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+    markdown = open(from_path, "r").read()
+    template = open(template_path, "r").read()
+    mhtml = markdown_to_html_node(markdown)
+    html = mhtml.to_html()
+    title = extract_title(markdown)
+    page = template.replace(placeholder_title, title).replace(placeholder_content, html)
+    dir = os.path.split(dest_path)[0]
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+        raise Exception("Figure this out.")
+    with open(dest_path, "w") as o:
+        o.write(page)
+
+
 def main():
     if os.path.exists(LOGFILE):
         os.remove(LOGFILE)
@@ -45,6 +64,8 @@ def main():
         raise Exception("No files found to copy from source directory!")
 
     copy_to_public(STATIC, PUBLIC)
+
+    generate_page("content/index.md", "template.html", "public/index.html")
 
     logger.info("Finished")
 

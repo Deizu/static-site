@@ -7,21 +7,21 @@ from split_nodes import (
 )
 
 
-def text_to_textnodes(text):
-    return split_nodes_image(
-        split_nodes_link(
+def inline_splits(text):
+    return split_nodes_delimiter(
+        split_nodes_delimiter(
             split_nodes_delimiter(
-                split_nodes_delimiter(
-                    split_nodes_delimiter(
-                        [TextNode(text, TextType.TEXT)],
-                        Delimiter.DOUBLE_ASTERISKS,
-                        TextType.BOLD,
-                    ),
-                    Delimiter.UNDERSCORE,
-                    TextType.ITALIC,
-                ),
-                Delimiter.BACKTICK,
-                TextType.CODE,
-            )
-        )
+                [TextNode(text, TextType.TEXT)],
+                Delimiter.DOUBLE_ASTERISKS,
+                TextType.BOLD,
+            ),
+            Delimiter.UNDERSCORE,
+            TextType.ITALIC,
+        ),
+        Delimiter.BACKTICK,
+        TextType.CODE,
     )
+
+
+def text_to_textnodes(text):
+    return split_nodes_image(split_nodes_link(inline_splits(text)))

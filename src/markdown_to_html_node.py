@@ -1,14 +1,11 @@
 from markdown_to_blocks import markdown_to_blocks
 from block_to_block_type import block_to_block_type, BlockType
-from htmlnode import HTMLNode, ParentNode, LeafNode
-from text_to_textnodes import text_to_textnodes
+from htmlnode import ParentNode, LeafNode
+from text_to_textnodes import text_to_textnodes, inline_splits
 from text_to_html import text_node_to_html_node
-from split_nodes import (
-    split_nodes_delimiter,
-    split_nodes_image,
-    split_nodes_link,
-    Delimiter,
-)
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def markdown_to_html_node(markdown):
@@ -23,6 +20,7 @@ def markdown_to_html_node(markdown):
         block_type = block_to_block_type(block)
         if block_type == BlockType.PARAGRAPH:
             text_nodes = text_to_textnodes(block)
+            logger.debug(text_nodes)
             for text_node in text_nodes:
                 text_node.text = change_newlines_to_spaces(text_node.text)
             parent = ParentNode(
@@ -40,19 +38,24 @@ def markdown_to_html_node(markdown):
             block = block.replace(f"{'#'*heading_level} ", "")
             parent = LeafNode(f"h{heading_level}", block)
         if block_type == BlockType.UNORDERED_LIST:
-            list_items = [
-                LeafNode("li", x.replace("- ", "")) for x in block.split("\n")
-            ]
+            list_items = []
+            for x in block.replace("- ", "").split("\n"):
+                text_nodes = text_to_textnodes(x)
+                html_nodes = []
+                for y in text_nodes:
+                    html_nodes.append(text_node_to_html_node(y))
+                list_items.append(ParentNode("li", html_nodes))
             parent = ParentNode("ul", list_items)
         if block_type == BlockType.ORDERED_LIST:
             list_items = []
             ordered_items = block.split("\n")
             for i in range(0, len(ordered_items)):
-                list_items.append(
-                    LeafNode("li", ordered_items[i].replace(f"{i+1}. ", ""))
-                )
+                text_nodes = text_to_textnodes(ordered_items[i].replace(f"{i+1}. ", ""))
+                html_nodes = []
+                for x in text_nodes:
+                    html_nodes.append(text_node_to_html_node(x))
+                list_items.append(ParentNode("li", html_nodes))
             parent = ParentNode("ol", list_items)
         all_children.append(parent)
     top_level_parent = ParentNode("div", all_children)
-    # print(f"\n\nMTHN -> HTML | {top_level_parent.to_html()}")
     return top_level_parent

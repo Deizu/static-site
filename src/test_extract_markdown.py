@@ -1,5 +1,9 @@
 import unittest
-from extract_markdown import extract_markdown_images, extract_markdown_links
+from extract_markdown import (
+    extract_markdown_images,
+    extract_markdown_links,
+    extract_title,
+)
 
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
@@ -59,6 +63,15 @@ class TestExtractMarkdown(unittest.TestCase):
             [],
             matches,
         )
+
+    def test_extract_title(self):
+        self.assertEqual(extract_title("# Hello"), "Hello")
+        with self.assertRaises(Exception) as t:
+            extract_title("no titles")
+            self.assertEqual(t.exception, "No H1 title found in markdown.")
+        with self.assertRaises(Exception) as t:
+            extract_title("# one\n# two titles")
+            self.assertEqual(t.exception, "Multiple H1 titles found.")
 
 
 if __name__ == "__main__":

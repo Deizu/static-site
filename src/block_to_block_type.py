@@ -33,9 +33,6 @@ def block_to_block_type(block):
         and all_lines_start_with_digit_period_and_space
         and all_numbers_are_incremented_by_one
     ):
-        # print(
-        #     f"Block: {block}\n\tStarts at 1?: {starts_with_one}\n\tAll lines start with a digit?: {all_lines_start_with_digit_period_and_space}\n\tAll numbers increment by one?: {all_numbers_are_incremented_by_one}"
-        # )
         return BlockType.ORDERED_LIST
     else:
         return BlockType.PARAGRAPH
