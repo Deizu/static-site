@@ -38,8 +38,7 @@ def generate_page(from_path, template_path, dest_path):
     page = template.replace(placeholder_title, title).replace(placeholder_content, html)
     dir = os.path.split(dest_path)[0]
     if not os.path.exists(dir):
-        os.mkdir(dir)
-        raise Exception("Figure this out.")
+        os.makedirs(dir)
     with open(dest_path, "w") as o:
         o.write(page)
 
@@ -66,6 +65,22 @@ def main():
     copy_to_public(STATIC, PUBLIC)
 
     generate_page("content/index.md", "template.html", "public/index.html")
+    generate_page(
+        "content/blog/glorfindel/index.md",
+        "template.html",
+        "public/blog/glorfindel/index.html",
+    )
+    generate_page(
+        "content/blog/majesty/index.md",
+        "template.html",
+        "public/blog/majesty/index.html",
+    )
+    generate_page(
+        "content/blog/tom/index.md", "template.html", "public/blog/tom/index.html"
+    )
+    generate_page(
+        "content/contact/index.md", "template.html", "public/contact/index.html"
+    )
 
     logger.info("Finished")
 

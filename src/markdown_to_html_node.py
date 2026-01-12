@@ -36,7 +36,11 @@ def markdown_to_html_node(markdown):
             heading_level = block.count("#")
             block = change_newlines_to_spaces(block)
             block = block.replace(f"{'#'*heading_level} ", "")
-            parent = LeafNode(f"h{heading_level}", block)
+            text_nodes = text_to_textnodes(block)
+            html_nodes = []
+            for x in text_nodes:
+                html_nodes.append(text_node_to_html_node(x))
+            parent = ParentNode(f"h{heading_level}", html_nodes)
         if block_type == BlockType.UNORDERED_LIST:
             list_items = []
             for x in block.replace("- ", "").split("\n"):
