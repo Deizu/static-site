@@ -1,15 +1,11 @@
 from markdown_to_blocks import markdown_to_blocks
 from block_to_block_type import block_to_block_type, BlockType
 from htmlnode import ParentNode, LeafNode
-from text_to_textnodes import text_to_textnodes, inline_splits
+from text_to_textnodes import text_to_textnodes
 from text_to_html import text_node_to_html_node
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 def markdown_to_html_node(markdown):
-    # split into blocks
     blocks = markdown_to_blocks(markdown)
     all_children = []
 
@@ -20,7 +16,6 @@ def markdown_to_html_node(markdown):
         block_type = block_to_block_type(block)
         if block_type == BlockType.PARAGRAPH:
             text_nodes = text_to_textnodes(block)
-            # logger.debug(text_nodes)
             for text_node in text_nodes:
                 text_node.text = change_newlines_to_spaces(text_node.text)
             parent = ParentNode(

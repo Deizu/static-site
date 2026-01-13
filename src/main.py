@@ -12,27 +12,24 @@ logger = logging.getLogger(__name__)
 
 
 def copy_to_publish(start_dir, structure):
-    # logger.info("Recursive Copy Routine")
     for fp in os.listdir(start_dir):
         source_path = os.path.join(start_dir, fp)
         target_path = os.path.join(structure, fp)
         if os.path.isdir(source_path):
-            # logger.debug("Copy - Directory")
             os.mkdir(target_path)
             copy_to_publish(source_path, target_path)
         elif os.path.isfile(source_path):
-            # logger.debug("Copy - File")
-            # logger.info(f"Filepath: {source_path}\n\tStructure: {target_path}")
             shutil.copy(source_path, target_path)
         else:
-            # logger.debug("Copy - ???")
-            print(f"Uh....{source_path} is neither a file nor directory. Now what?")
+            raise Exception(f"{source_path} is neither a file nor directory.")
 
 
 def generate_page(from_path, template_path, dest_path, basepath):
     placeholder_title = "{{ Title }}"
     placeholder_content = "{{ Content }}"
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+    log_msg = f"Generating page from {from_path} to {dest_path} using {template_path}."
+    print(log_msg)
+    logger.info(log_msg)
     markdown = open(from_path, "r").read()
     template = open(template_path, "r").read()
     mhtml = markdown_to_html_node(markdown)
