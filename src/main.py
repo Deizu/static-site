@@ -4,6 +4,7 @@ from extract_markdown import extract_title
 
 PUBLIC = "public"
 LOGFILE = "logs/main.log"
+TEMPLATE = "template.html"
 STATIC = "static"
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,21 @@ def generate_page(from_path, template_path, dest_path):
         o.write(page)
 
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dir_path_content):
+        raise Exception("Content directory not found!")
+    if len(os.listdir(dir_path_content)) == 0:
+        raise Exception("Content directory is empty!")
+    for item in os.listdir(dir_path_content):
+        source_path = os.path.join(dir_path_content, item)
+        target_path = os.path.join(dest_dir_path, item)
+        if os.path.isfile(source_path) and "." in item and item.split(".")[1] == "md":
+            target_path = target_path.replace(".md", ".html")
+            generate_page(source_path, template_path, target_path)
+        elif os.path.isdir(source_path):
+            generate_pages_recursive(source_path, template_path, target_path)
+
+
 def main():
     if os.path.exists(LOGFILE):
         os.remove(LOGFILE)
@@ -64,23 +80,24 @@ def main():
 
     copy_to_public(STATIC, PUBLIC)
 
-    generate_page("content/index.md", "template.html", "public/index.html")
-    generate_page(
-        "content/blog/glorfindel/index.md",
-        "template.html",
-        "public/blog/glorfindel/index.html",
-    )
-    generate_page(
-        "content/blog/majesty/index.md",
-        "template.html",
-        "public/blog/majesty/index.html",
-    )
-    generate_page(
-        "content/blog/tom/index.md", "template.html", "public/blog/tom/index.html"
-    )
-    generate_page(
-        "content/contact/index.md", "template.html", "public/contact/index.html"
-    )
+    generate_pages_recursive("content", TEMPLATE, "public")
+    # generate_page("content/index.md", "template.html", "public/index.html")
+    # generate_page(
+    #     "content/blog/glorfindel/index.md",
+    #     "template.html",
+    #     "public/blog/glorfindel/index.html",
+    # )
+    # generate_page(
+    #     "content/blog/majesty/index.md",
+    #     "template.html",
+    #     "public/blog/majesty/index.html",
+    # )
+    # generate_page(
+    #     "content/blog/tom/index.md", "template.html", "public/blog/tom/index.html"
+    # )
+    # generate_page(
+    #     "content/contact/index.md", "template.html", "public/contact/index.html"
+    # )
 
     logger.info("Finished")
 
