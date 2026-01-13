@@ -20,7 +20,7 @@ def markdown_to_html_node(markdown):
         block_type = block_to_block_type(block)
         if block_type == BlockType.PARAGRAPH:
             text_nodes = text_to_textnodes(block)
-            logger.debug(text_nodes)
+            # logger.debug(text_nodes)
             for text_node in text_nodes:
                 text_node.text = change_newlines_to_spaces(text_node.text)
             parent = ParentNode(
